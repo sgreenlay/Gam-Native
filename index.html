@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Simple WASM</title>
+    </head>
+    <body>
+        <script>
+        var importObject = { 
+            env: {
+                logInt: arg => console.log('WASM: ' + arg) 
+            }
+        };
+
+        request = new XMLHttpRequest();
+        request.open('GET', 'main.wasm');
+        request.responseType = 'arraybuffer';
+        request.send();
+
+        request.onload = function() {
+            var bytes = request.response;
+            WebAssembly.instantiate(bytes, importObject).then(results => {
+                console.log('JS: ' + results.instance.exports.add(1, 2));
+            });
+        };
+        </script>
+    </body>
+</html>
