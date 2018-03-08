@@ -12,17 +12,9 @@
             }
         };
 
-        request = new XMLHttpRequest();
-        request.open('GET', 'main.wasm');
-        request.responseType = 'arraybuffer';
-        request.send();
-
-        request.onload = function() {
-            var bytes = request.response;
-            WebAssembly.instantiate(bytes, importObject).then(results => {
-                console.log('JS: ' + results.instance.exports.add(1, 2));
-            });
-        };
+        WebAssembly.instantiateStreaming(fetch('main.wasm'), importObject).then(results => {
+            console.log('JS: ' + results.instance.exports.add(1, 2));
+        });
         </script>
     </body>
 </html>
