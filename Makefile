@@ -3,10 +3,10 @@ all: main.wasm
 llvm=C:\Users\sgree\Downloads\LLVM\build\Release\bin
 binaryen=C:\Users\sgree\Downloads\Binaryen\build\bin
 
-main.s: main.cpp
+main.ll: main.cpp
   $(llvm)\clang++ -emit-llvm --target=wasm32-unknown-unknown-elf -nostdlib -S main.cpp
 
-main.ll: main.ll
+main.s: main.ll
   $(llvm)\llc -march=wasm32 -o main.s main.ll
 
 main.wast: main.s
