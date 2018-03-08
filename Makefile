@@ -6,10 +6,10 @@ binaryen=C:\Users\sgree\Downloads\Binaryen\build\bin
 main.s: main.cpp
   $(llvm)\clang++ -emit-llvm --target=wasm32-unknown-unknown-elf -nostdlib -S main.cpp
 
-main.ll: main.s
+main.ll: main.ll
   $(llvm)\llc -march=wasm32 -o main.s main.ll
 
-main.wast: main.ll
+main.wast: main.s
   $(binaryen)\s2wasm --allocate-stack 1000000 -o main.wast main.s
 
 main.wasm: main.wast
