@@ -1,16 +1,16 @@
-all: main.wasm
 
-llvm=C:\Users\sgree\Downloads\LLVM\build\Release\bin
-binaryen=C:\Users\sgree\Downloads\Binaryen\build\bin
+cc = toolchain\cl.bat
+link = toolchain\link.bat
 
-main.ll: main.cpp
-  $(llvm)\clang++ -emit-llvm --target=wasm32-unknown-unknown-elf -nostdlib -S main.cpp
+exe = main
 
-main.s: main.ll
-  $(llvm)\llc -march=wasm32 -o main.s main.ll
+src = main.cpp secondary.cpp
+objs = $(src:.cpp=.ll)
 
-main.wast: main.s
-  $(binaryen)\s2wasm --allocate-stack 1000000 -o main.wast main.s
+all: $(exe).wasm
 
-main.wasm: main.wast
-  $(binaryen)\wasm-as -o main.wasm main.wast
+.cpp.ll:
+  $(cc) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+$(exe).wasm: $(objs) 
+  $(link) -o $(exe) $(objs)

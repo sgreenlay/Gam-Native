@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Simple WASM</title>
+        <title>Gam</title>
     </head>
     <body>
         <style>
@@ -43,7 +43,10 @@
             };
 
             WebAssembly.instantiateStreaming(fetch('main.wasm'), importObject).then(results => {
+                console.log(results.instance.exports.add(1, 1));
+
                 results.instance.exports.init(size.width, size.height);
+
                 function renderTick(timestamp) {
                     results.instance.exports.render();
                     window.requestAnimationFrame(renderTick);

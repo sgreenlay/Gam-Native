@@ -1,6 +1,6 @@
-extern "C" void log(int n);
 
-extern "C" void drawRect(int x, int y, int w, int h, int r, int g, int b, float a);
+#include "imports.h"
+#include "exports.h"
 
 typedef struct {
     int width;
@@ -9,13 +9,13 @@ typedef struct {
 
 static window g_window;
 
-extern "C" void init(int w, int h)
+void init(int w, int h)
 {
     g_window.width = w;
     g_window.height = h;
 }
 
-extern "C" void render()
+void render()
 {
     drawRect(0, 0, g_window.width, g_window.height, 255, 255, 255, 1.0f);
     drawRect(
