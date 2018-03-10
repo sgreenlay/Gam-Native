@@ -9,8 +9,11 @@ objs = $(src:.cpp=.ll)
 
 all: $(exe).wasm
 
+clean:
+  del *.ll *.s *.wast *.wasm
+
 .cpp.ll:
-  $(cc) $(CFLAGS) $(INCLUDES) -c $< -o $@
+  $(cc) -c $*.cpp
 
 $(exe).wasm: $(objs) 
   $(link) -o $(exe) $(objs)
