@@ -5,16 +5,51 @@
         <title>Simple WASM</title>
     </head>
     <body>
-        <script>
-        var importObject = { 
-            env: {
-                logInt: arg => console.log('WASM: ' + arg) 
+        <style>
+            body {
+                background-color: black;
             }
-        };
+            #canvas {
+                position: fixed;
+                width: 800px;
+                left: 50%;
+                margin-left: -400px;
+                height: 480px;
+                top: 50%;
+                margin-top: -240px;
+            }
+        </style>
+        <canvas id="canvas" width="800" height="480"></canvas>
+        <script>
+            var canvas = document.getElementById("canvas");
+            var context = canvas.getContext("2d");
 
-        WebAssembly.instantiateStreaming(fetch('main.wasm'), importObject).then(results => {
-            console.log('JS: ' + results.instance.exports.add(1, 2));
-        });
+            var size = { width: canvas.width, height: canvas.height };
+
+            canvas.width = canvas.width * window.devicePixelRatio;
+            canvas.height = canvas.height * window.devicePixelRatio;
+            context.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            var importObject = {
+                env: {
+                    log: arg => {
+                        console.log(arg);
+                    },
+                    drawRect : (x, y, w, h, r, g, b, a) => {
+                        context.fillStyle = 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')';
+                        context.fillRect(x, y, w, h);
+                    }
+                }
+            };
+
+            WebAssembly.instantiateStreaming(fetch('main.wasm'), importObject).then(results => {
+                results.instance.exports.init(size.width, size.height);
+                function renderTick(timestamp) {
+                    results.instance.exports.render();
+                    window.requestAnimationFrame(renderTick);
+                }
+                renderTick();
+            });
         </script>
     </body>
 </html>
