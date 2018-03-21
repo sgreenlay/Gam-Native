@@ -25,10 +25,24 @@
             var context = canvas.getContext("2d");
 
             var size = { width: canvas.width, height: canvas.height };
+            var mouse = { x : 0, y : 0 };
 
             canvas.width = canvas.width * window.devicePixelRatio;
             canvas.height = canvas.height * window.devicePixelRatio;
             context.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            var getRelativeCoordinates = (event) => {
+                var rect = canvas.getBoundingClientRect();
+
+                var x = event.clientX - rect.left;
+                var y = event.clientY - rect.top;
+
+                return { x : x, y : y };
+            };
+
+            canvas.addEventListener('mousemove', (event) => {
+                mouse = getRelativeCoordinates(event);
+            });
 
             var importObject = {
                 env: {
@@ -43,11 +57,10 @@
             };
 
             WebAssembly.instantiateStreaming(fetch('main.wasm'), importObject).then(results => {
-                console.log(results.instance.exports.add(1, 1));
-
                 results.instance.exports.init(size.width, size.height);
 
                 function renderTick(timestamp) {
+                    results.instance.exports.mouseMoved(mouse.x, mouse.y);
                     results.instance.exports.render();
                     window.requestAnimationFrame(renderTick);
                 }

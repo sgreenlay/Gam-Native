@@ -4,7 +4,7 @@ link = toolchain\link.bat
 
 exe = main
 
-src = main.cpp secondary.cpp
+src = main.cpp
 objs = $(src:.cpp=.ll)
 
 all: $(exe).wasm
