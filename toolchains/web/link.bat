@@ -15,7 +15,7 @@ GOTO parse
 set llvm=C:\Users\sgree\Downloads\LLVM\build\Release\bin
 set binaryen=C:\Users\sgree\Downloads\Binaryen\build\bin
 
-%llvm%\llvm-link -o %output%-combined.ll %input%
-%llvm%\llc -march=wasm32 -o %output%.s %output%-combined.ll
+%llvm%\llvm-link -o %output%.ll %input%
+%llvm%\llc -march=wasm32 -o %output%.s %output%.ll
 %binaryen%\s2wasm --allocate-stack 1000000 -o %output%.wast %output%.s
-%binaryen%\wasm-as -o %output%.wasm %output%.wast
+%binaryen%\wasm-as -o %output% %output%.wast

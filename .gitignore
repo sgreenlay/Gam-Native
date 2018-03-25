@@ -1,6 +1,3 @@
 .vscode/*
 .vs/*
-*.ll
-*.s
-*.wasm
-*.wast
+build*/*

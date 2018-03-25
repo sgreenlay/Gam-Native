@@ -1,6 +1,6 @@
 
-#include "imports.h"
-#include "exports.h"
+#include "Imports.h"
+#include "Exports.h"
 
 typedef struct {
     int width;

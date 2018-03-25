@@ -46,9 +46,6 @@
 
             var importObject = {
                 env: {
-                    log: arg => {
-                        console.log(arg);
-                    },
                     drawRect : (x, y, w, h, r, g, b, a) => {
                         context.fillStyle = 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')';
                         context.fillRect(x, y, w, h);
@@ -56,7 +53,7 @@
                 }
             };
 
-            WebAssembly.instantiateStreaming(fetch('main.wasm'), importObject).then(results => {
+            WebAssembly.instantiateStreaming(fetch('engine.wasm'), importObject).then(results => {
                 results.instance.exports.init(size.width, size.height);
 
                 function renderTick(timestamp) {
