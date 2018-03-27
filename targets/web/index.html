@@ -61,7 +61,7 @@
                     results.instance.exports.render();
                     window.requestAnimationFrame(renderTick);
                 }
-                renderTick();
+                window.requestAnimationFrame(renderTick);
             });
         </script>
     </body>

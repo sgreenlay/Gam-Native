@@ -1,3 +1,4 @@
+
 set(CMAKE_SYSTEM_NAME "Binaryen")
 set(CMAKE_SYSTEM_VERSION 1)
 
@@ -59,20 +60,6 @@ set(CMAKE_RANLIB "${CMAKE_CURRENT_LIST_DIR}/web/link.bat" CACHE FILEPATH "")
 set(CMAKE_LINKER "${CMAKE_CURRENT_LIST_DIR}/web/link.bat" CACHE FILEPATH "")
 
 set(CMAKE_CXX_CREATE_SHARED_LIBRARY "<CMAKE_LINKER> -o <TARGET> <OBJECTS>")
-
-#set llvm=C:\Users\sgree\Downloads\LLVM\build\Release\bin
-#set binaryen=C:\Users\sgree\Downloads\Binaryen\build\bin
-
-#set(LLVM_ROOT "C:\\Users\\sgree\\Downloads\\LLVM\\build\\Release\\bin" CACHE STRING "")
-#set(BINARYEN_ROOT "C:\\Users\\sgree\\Downloads\\Binaryen\\build\\bin" CACHE STRING "")
-
-#set(CMAKE_CXX_CREATE_SHARED_LIBRARY
-#    "${LLVM_ROOT}/llvm-link <OBJECTS> -o CMakeFiles/<TARGET_NAME>.dir/<TARGET_NAME>.ll"
-#    "${LLVM_ROOT}/llc -march=wasm32 -o CMakeFiles/<TARGET_NAME>.dir/<TARGET_NAME>.s CMakeFiles/<TARGET_NAME>.dir/<TARGET_NAME>.ll"
-#    "${BINARYEN_ROOT}/s2wasm --allocate-stack 1000000 -o CMakeFiles/<TARGET_NAME>.dir/<TARGET_NAME>.wast CMakeFiles/<TARGET_NAME>.dir/<TARGET_NAME>.s"
-#    "${BINARYEN_ROOT}/wasm-as -o <TARGET> CMakeFiles/<TARGET_NAME>.dir/<TARGET_NAME>.wast"
-#    CACHE STRING ""
-#)
 
 set(CMAKE_C_COMPILER_ID_RUN TRUE)
 set(CMAKE_C_COMPILER_FORCED TRUE)

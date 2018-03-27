@@ -7,8 +7,6 @@ endif()
 
 project(gam CXX)
 
-include(CMakePrintSystemInformation)
-
 ## ENGINE
 file(GLOB_RECURSE ENGINE_SOURCES engine/src/*.cpp)
 add_library(engine ${ENGINE_SOURCES})
