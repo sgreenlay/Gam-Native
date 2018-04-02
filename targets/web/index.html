@@ -40,12 +40,11 @@
                     var size = s.length + 1;
                     var offset = exportObject.internal.malloc(size);
 
-                    var encoder = new TextEncoder("utf-8");
                     for (var i = 0; i < size - 1; i++)
                     {
-                        exportObject.internal.memory[offset + i] = encoder.encode(s[i]);
+                        exportObject.internal.memory[offset + i] = s.charCodeAt(i);
                     }
-                    exportObject.internal.memory[offset + size - 1] = encoder.encode('\0');
+                    exportObject.internal.memory[offset + size - 1] = 0;
 
                     return {
                         start : offset,
