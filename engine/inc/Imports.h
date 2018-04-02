@@ -1,6 +1,8 @@
 
 extern "C" void abort();
 
+extern "C" void log(char*);
+
 extern "C" double cos(double radians);
 extern "C" double sin(double radians);
 extern "C" double random();

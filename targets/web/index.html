@@ -20,7 +20,68 @@
             }
         </style>
         <canvas id="canvas" width="800" height="480"></canvas>
+        <form id="entry">
+            <input name="text" type="text"/>
+            <input name="run" type="submit"/>
+        </form>
         <script>
+            var exportObject = {
+                internal : {
+                    memory : null,
+                    malloc : null,
+                    free : null
+                },
+                allocateString : (s) => {
+                    if (exportObject.internal.memory == null)
+                    {
+                        return null;
+                    }
+
+                    var size = s.length + 1;
+                    var offset = exportObject.internal.malloc(size);
+
+                    var encoder = new TextEncoder("utf-8");
+                    for (var i = 0; i < size - 1; i++)
+                    {
+                        exportObject.internal.memory[offset + i] = encoder.encode(s[i]);
+                    }
+                    exportObject.internal.memory[offset + size - 1] = encoder.encode('\0');
+
+                    return {
+                        start : offset,
+                        size : size
+                    };
+                },
+                freeString : (str) => {
+                    if (exportObject.internal.memory != null)
+                    {
+                        exportObject.internal.free(str.start);
+                    }
+                },
+                getString : (offset) => {
+                    if (exportObject.internal.memory == null)
+                    {
+                        return "";
+                    }
+
+                    let s = "";
+                    while (exportObject.internal.memory[offset] != 0) {
+                        s += String.fromCharCode(exportObject.internal.memory[offset]);
+                        offset++;
+                    }
+                    return s;
+                }
+            };
+
+            var form = document.getElementById("entry");
+            function handleForm(event) {
+                event.preventDefault();
+                var string = event.currentTarget.elements["text"].value;
+                exportObject.onInput(string);
+                
+            };
+            form.addEventListener('submit', handleForm);
+
             var canvas = document.getElementById("canvas");
             var context = canvas.getContext("2d");
 
@@ -60,6 +121,9 @@
                     random : () => { return Math.random(); },
                     sin : (f) => { return Math.sin(f); },
                     cos : (f) => { return Math.cos(f); },
+                    log : (offset) => {
+                        console.log(exportObject.getString(offset));
+                    },
                     drawRect : (x, y, w, h, r, g, b, a, rad) => {
                         context.save();
 
@@ -81,6 +145,16 @@
             };
 
             WebAssembly.instantiateStreaming(fetch('engine.wasm'), importObject).then(results => {
+                exportObject.internal.memory = new Uint8Array(results.instance.exports.memory.buffer);
+                exportObject.internal.malloc = results.instance.exports.malloc;
+                exportObject.internal.free = results.instance.exports.free;
+
+                exportObject.onInput = function(str) {
+                    var s = exportObject.allocateString(str);
+                    results.instance.exports.onInput(s.start);
+                    exportObject.freeString(s);
+                };
+
                 results.instance.exports.init(size.width, size.height);
 
                 function renderTick(timestamp) {

@@ -14,6 +14,7 @@ typedef struct {
 typedef struct {
     int x;
     int y;
+    bool click;
     bool pressed;
 } mouse;
 
@@ -166,6 +167,8 @@ static plant * p2;
 
 void init(int w, int h)
 {
+    log("hello world");
+
     g_window.width = w;
     g_window.height = h;
 
@@ -177,11 +180,20 @@ void init(int w, int h)
     g_mouse.y = g_window.height / 2;
 }
 
+void onInput(char * c)
+{
+    log(c);
+}
+
 void mouseMoved(int x, int y, bool pressed)
 {
     g_mouse.x = x;
     g_mouse.y = y;
 
+    if (g_mouse.pressed && !pressed)
+    {
+        g_mouse.click = true;
+    }
     g_mouse.pressed = pressed;
 }
 
@@ -189,7 +201,7 @@ void render()
 {
     drawRect(0, 0, g_window.width, g_window.height, 255, 255, 255, 1.0f, 0.0f);
 
-    if (g_mouse.pressed)
+    if (g_mouse.click)
     {
         *p = plant::make_random();
     }
@@ -198,6 +210,7 @@ void render()
         p->physics_into(*p2);
         swap(p, p2);
     }
+    g_mouse.click = false;
 
     p->render();
 

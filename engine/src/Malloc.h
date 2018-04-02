@@ -1,6 +1,8 @@
 
 #include <stddef.h>
 
+#include "Exports.h"
+
 void* malloc(unsigned int);
 void free(void*);
 
