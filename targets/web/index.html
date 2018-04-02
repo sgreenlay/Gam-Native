@@ -25,7 +25,7 @@
             var context = canvas.getContext("2d");
 
             var size = { width: canvas.width, height: canvas.height };
-            var mouse = { x : 0, y : 0 };
+            var mouse = { pressed : false, position : { x : 0, y : 0 } };
 
             canvas.width = canvas.width * window.devicePixelRatio;
             canvas.height = canvas.height * window.devicePixelRatio;
@@ -40,15 +40,42 @@
                 return { x : x, y : y };
             };
 
+            canvas.addEventListener('mousedown', (event) => {
+                mouse.pressed = true;
+                mouse.position = getRelativeCoordinates(event);
+            });
+
             canvas.addEventListener('mousemove', (event) => {
-                mouse = getRelativeCoordinates(event);
+                mouse.position = getRelativeCoordinates(event);
+            });
+
+            canvas.addEventListener('mouseup', (event) => {
+                mouse.position = getRelativeCoordinates(event);
+                mouse.pressed = false;
             });
 
             var importObject = {
                 env: {
-                    drawRect : (x, y, w, h, r, g, b, a) => {
+                    abort : () => { alert("Out of memory!"); },
+                    random : () => { return Math.random(); },
+                    sin : (f) => { return Math.sin(f); },
+                    cos : (f) => { return Math.cos(f); },
+                    drawRect : (x, y, w, h, r, g, b, a, rad) => {
+                        context.save();
+
+                        if (rad != 0.0)
+                        {
+                            context.translate(x + w / 2, y + h / 2 );
+                            context.rotate(rad);
+
+                            x = 0;
+                            y = 0;
+                        }
+
                         context.fillStyle = 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')';
                         context.fillRect(x, y, w, h);
+
+                        context.restore();
                     }
                 }
             };
@@ -57,11 +84,11 @@
                 results.instance.exports.init(size.width, size.height);
 
                 function renderTick(timestamp) {
-                    results.instance.exports.mouseMoved(mouse.x, mouse.y);
+                    results.instance.exports.mouseMoved(mouse.position.x, mouse.position.y, mouse.pressed);
                     results.instance.exports.render();
                     window.requestAnimationFrame(renderTick);
                 }
-                window.requestAnimationFrame(renderTick);
+                renderTick(0);
             });
         </script>
     </body>
