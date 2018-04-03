@@ -4,7 +4,24 @@
 
 #include "Util.h"
 
+#if defined(BINARYEN)
 extern "C" int atexit(void (*func)()) { return 0; }
+#else
+#include <random>
+
+extern "C" double random()
+{
+    static std::default_random_engine gen;
+    static std::uniform_real_distribution<> dist(0, 1);
+    return dist(gen);
+}
+
+extern "C" void console_log(char* msg)
+{
+    fputs(msg, stdout);
+}
+
+#endif
 
 typedef struct {
     int width;
@@ -37,10 +54,10 @@ struct branch
     void render() const
     {
         drawRect(
-            x,
-            y,
-            width,
-            height,
+            (int)x,
+            (int)y,
+            (int)width,
+            (int)height,
             0, 255, 0, 1.0f,
             r);
     }
@@ -167,7 +184,7 @@ static plant * p2;
 
 void init(int w, int h)
 {
-    log("hello world");
+    console_log("hello world");
 
     g_window.width = w;
     g_window.height = h;
@@ -182,7 +199,7 @@ void init(int w, int h)
 
 void onInput(char * c)
 {
-    log(c);
+    console_log(c);
 }
 
 void mouseMoved(int x, int y, bool pressed)
