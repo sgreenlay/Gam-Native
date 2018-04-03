@@ -1,4 +1,4 @@
-
+#if defined(BINARYEN)
 #include "Malloc.h"
 
 #include "Imports.h"
@@ -41,3 +41,4 @@ void* operator new(size_t sz) {
 void operator delete(void* p) {
     return free(p);
 }
+#endif

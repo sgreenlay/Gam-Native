@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 if(CMAKE_SYSTEM_NAME STREQUAL "Binaryen" AND NOT CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/toolchains/web.cmake" CACHE STRING "")
     set(BUILD_SHARED_LIBS ON CACHE BOOL "")
+    add_definitions(BINARYEN)
 endif()
 
 project(gam CXX)

@@ -1,4 +1,5 @@
 
+#if defined(BINARYEN)
 #include <stddef.h>
 
 #include "Exports.h"
@@ -13,3 +14,4 @@ void* operator new[](size_t sz);
 void operator delete[](void* p);
 
 inline void* operator new(size_t, void* ptr) { return ptr; }
+#endif
