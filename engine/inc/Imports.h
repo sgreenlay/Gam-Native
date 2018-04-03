@@ -11,5 +11,6 @@ extern "C" double sin(double radians);
 #endif
 
 extern "C" void console_log(char*);
+
 extern "C" double random();
 extern "C" void drawRect(int x, int y, int w, int h, int r, int g, int b, float a, double radians);

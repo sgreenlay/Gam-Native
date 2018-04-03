@@ -77,7 +77,6 @@
                 event.preventDefault();
                 var string = event.currentTarget.elements["text"].value;
                 exportObject.onInput(string);
-                
             };
             form.addEventListener('submit', handleForm);
 
@@ -120,7 +119,7 @@
                     random : () => { return Math.random(); },
                     sin : (f) => { return Math.sin(f); },
                     cos : (f) => { return Math.cos(f); },
-                    log : (offset) => {
+                    console_log : (offset) => {
                         console.log(exportObject.getString(offset));
                     },
                     drawRect : (x, y, w, h, r, g, b, a, rad) => {
@@ -161,7 +160,7 @@
                     results.instance.exports.render();
                     window.requestAnimationFrame(renderTick);
                 }
-                renderTick(0);
+                window.requestAnimationFrame(renderTick);
             });
         </script>
     </body>

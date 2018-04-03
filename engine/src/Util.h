@@ -3,6 +3,8 @@
 #include "Malloc.h"
 #include "Imports.h"
 
+constexpr double PI = 3.141592653;
+
 // <type_traits>
 template<class T> struct remove_reference { using type = T; };
 template<class T> struct remove_reference<T&> { using type = T; };
@@ -15,6 +17,30 @@ constexpr T&& forward(remove_reference_t<T>& t) { return static_cast<T&&>(t); }
 template<class T>
 constexpr remove_reference_t<T>&& move(T&& t) { return static_cast<remove_reference_t<T>&&>(t); }
 // </type_traits>
+
+// <optional>
+struct nullopt_t {};
+constexpr nullopt_t nullopt;
+
+template<class T>
+struct optional
+{
+    constexpr optional() : m_has_value(false) {}
+    constexpr optional(nullopt_t) : optional() {}
+
+    template<class...Xs>
+    constexpr optional(Xs&&...xs) : m_value(forward<Xs>(xs)...), m_has_value(true) {}
+
+    bool has_value() const { return m_has_value; }
+
+    T& value() { return m_value; }
+    const T& value() const { return m_value; }
+
+private:
+    T m_value;
+    bool m_has_value;
+};
+// </optional>
 
 template<class T>
 void swap(T& a, T& b)

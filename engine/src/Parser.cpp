@@ -1,47 +1,121 @@
 #include "Parser.h"
 
-namespace
+enum token_type
 {
-    struct string_span
+    error,
+    number,     // [0-9]
+    transition, // -[0-99]->
+    split,      // ;
+    end
+};
+
+struct token
+{
+    token_type type;
+    int value;
+};
+
+struct parser
+{
+    parser(const char* str) : str(str) {}
+
+    optional<rule> parse_rule()
     {
-        constexpr string_span() : m_str(nullptr), m_len(0) {}
-        constexpr string_span(const char* p, size_t l) : m_str(p), m_len(l) {}
-
-        string_span take(int n) const
+        token a = get_next();
+        if (a.type != number)
         {
-            return { m_str, m_len > n ? n : m_len };
+            return nullopt;
         }
 
-        string_span drop(int n) const
+        token p = get_next();
+        if (p.type != transition)
         {
-            auto dropped = m_len > n ? n : m_len;
-            return { m_str + dropped, m_len - dropped };
+            return nullopt;
         }
 
-        template<size_t Sz>
-        bool equals(char(&arr)[Sz]) const
+        token b = get_next();
+        if (b.type != number)
         {
-            static_assert(Sz > 0, "");
-            if (Sz - 1 != m_len) return false;
-            return memcmp(arr, m_str, Sz-1) == 0;
+            return nullopt;
         }
 
-    private:
-        const char* m_str;
-        size_t m_len;
-    };
-
-    ruleset parse_ruleset(string_span ss)
-    {
-        return {};
+        return rule{ a.value,  b.value, p.value / 100.0 };
     }
-}
 
-vector<ruleset> parse(const char* str, int len)
+private:
+
+    optional<int> get_number()
+    {
+        char c = *str;
+
+        if (c < '0' || c > '9')
+        {
+            return nullopt;
+        }
+
+        int value = 0;
+        while (c >= '0' && c <= '9')
+        {
+            int digit = c-'0';
+            value = value * 10 + digit;
+
+            c = *++str;
+        }
+
+        return value;
+    }
+
+    token get_next()
+    {
+        if (*str == '\0') return { end };
+
+        auto n = get_number();
+        if (n.has_value()) return { number, n.value() };
+
+        char c = *str++;
+
+        if (c == '-')
+        {
+            auto p = get_number();
+            if (!p.has_value())
+            {
+                return { error };
+            }
+            if (*str++ != '%')
+            {
+                return { error };
+            }
+            if (*str++ != '-')
+            {
+                return { error };
+            }
+            if (*str++ != '>')
+            {
+                return { error };
+            }
+            return { transition, p.value() };
+        }
+
+        if (c == ';') return { split };
+
+        return { error };
+    }
+
+    const char* str;
+};
+
+vector<rule> parse(const char* str)
 {
-    vector<ruleset> ret;
+    vector<rule> ret;
 
+    parser p(str);
 
+    auto r = p.parse_rule();
+    while (r.has_value())
+    {
+        ret.emplace_back(r.value());
+        r = p.parse_rule();
+    }
 
     return ret;
 }
