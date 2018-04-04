@@ -5,6 +5,7 @@ enum token_type
     error,
     number,     // [0-9]
     transition, // -[0-99]->
+    pair,       // [0-9],[0-9]
     split,      // ;
     end
 };
@@ -12,7 +13,8 @@ enum token_type
 struct token
 {
     token_type type;
-    int value;
+    int n;
+    int m;
 };
 
 struct parser
@@ -34,12 +36,16 @@ struct parser
         }
 
         token b = get_next();
-        if (b.type != number)
+        if (b.type == number)
         {
-            return nullopt;
+            return rule{ a.n, p.n / 100.0 , b.n};
+        }
+        else if (b.type == pair)
+        {
+            return rule{ a.n, p.n / 100.0 , b.n, b.m};
         }
 
-        return rule{ a.value,  b.value, p.value / 100.0 };
+        return nullopt;
     }
 
 private:
@@ -70,7 +76,22 @@ private:
         if (*str == '\0') return { end };
 
         auto n = get_number();
-        if (n.has_value()) return { number, n.value() };
+        if (n.has_value())
+        {
+            if (*str == ',')
+            {
+                str++;
+
+                auto m = get_number();
+                if (!m.has_value())
+                {
+                    return { error };
+                }
+
+                return { number, n.value(), m.value() };
+            }
+            return { number, n.value() };
+        }
 
         char c = *str++;
 

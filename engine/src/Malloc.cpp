@@ -50,13 +50,25 @@ void memscan()
 #endif
 }
 
-void memset(void * buffer, int size, char v)
+void* memset(void * buffer, int size, char v)
 {
     char * char_buffer = (char *)buffer;
     for (int i = 0; i < size; ++i)
     {
         char_buffer[i] = v;
     }
+    return buffer;
+}
+
+void* memcpy(void * dst, const void * src, unsigned int size)
+{
+    char * char_dst = (char *)dst;
+    char * char_src = (char *)src;
+    for (int i = 0; i < size; ++i)
+    {
+        char_dst[i] = char_src[i];
+    }
+    return dst;
 }
 
 void* malloc(const unsigned int size)

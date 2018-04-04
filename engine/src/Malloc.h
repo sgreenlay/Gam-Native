@@ -7,7 +7,8 @@
 #define MEMORYDEBUG 0
 
 void memscan();
-void memset(void*, int, char);
+void* memset(void*, int, char);
+void* memcpy(void*, const void*, unsigned int);
 
 void* malloc(unsigned int);
 void free(void*);

@@ -1,6 +1,8 @@
 
 #include "Util.h"
 
+struct rule;
+
 struct vec2
 {
     double x;
@@ -32,6 +34,8 @@ struct branch
 
     vec2 vel;
     double dr;
+
+    int state;
 };
 
 struct constraint
@@ -50,6 +54,7 @@ struct plant
     vector<constraint> constraints;
 
     void physics_into(plant& out, vec2 gravity, double floor) const;
+    void grow_into(plant& out, span<rule> rules) const;
 
     void render()
     {

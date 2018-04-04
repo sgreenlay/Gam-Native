@@ -66,7 +66,11 @@ void init(int w, int h)
 void onInput(char * c)
 {
     auto rules = parse(c);
-    console_log(c);
+
+    for (auto& rule : rules)
+    {
+        console_log(rule.start, " ", rule.probability, " ", rule.end, " ", rule.branch);
+    }
 }
 
 void mouseMoved(int x, int y, bool pressed)
