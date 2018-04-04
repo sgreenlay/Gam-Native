@@ -115,11 +115,12 @@
 
             var importObject = {
                 env: {
-                    abort : () => { alert("Out of memory!"); },
+                    abort : (offset) => { alert(exportObject.getString(offset)); },
                     random : () => { return Math.random(); },
                     sin : (f) => { return Math.sin(f); },
                     cos : (f) => { return Math.cos(f); },
-                    console_log : (offset) => {
+                    sqrt : (f) => { return Math.sqrt(f); },
+                    js_console_log : (offset) => {
                         console.log(exportObject.getString(offset));
                     },
                     drawRect : (x, y, w, h, r, g, b, a, rad) => {

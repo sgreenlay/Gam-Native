@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Malloc.h"
 #include "Imports.h"
+#include "Malloc.h"
 
 constexpr double PI = 3.141592653;
 
@@ -17,6 +17,25 @@ constexpr T&& forward(remove_reference_t<T>& t) { return static_cast<T&&>(t); }
 template<class T>
 constexpr remove_reference_t<T>&& move(T&& t) { return static_cast<remove_reference_t<T>&&>(t); }
 // </type_traits>
+
+char* strfmt_nz(char* out, int n);
+char* strfmt_nz(char* out, const char* s);
+
+inline char* strfmt(char* out) { *out = '\0'; return out; }
+
+template<class X, class...Xs>
+char* strfmt(char* out, X&& x, Xs&&...xs)
+{
+    return strfmt(strfmt_nz(out, forward<X>(x)), forward<Xs>(xs)...);
+}
+
+template<class...Xs>
+void console_log(Xs&&...xs)
+{
+    char buf[256];
+    strfmt(buf, forward<Xs>(xs)...);
+    ::js_console_log(buf);
+}
 
 // <optional>
 struct nullopt_t {};
@@ -85,10 +104,10 @@ struct vector
     T* begin() const { return m_data; }
     T* end() const { return m_size; }
 
-    T& operator[](int i) { return m_data[i]; }
-    const T& operator[](int i) const { return m_data[i]; }
+    T& operator[](int i) { if (i < 0 || i > size()) console_log("vector out of bounds: ", size(), "[", i, "]"); return m_data[i]; }
+    const T& operator[](int i) const { if (i < 0 || i > size()) console_log("vector out of bounds: ", size(), "[", i, "]");  return m_data[i]; }
 
-    T& back() { return *(end() - 1); }
+    T& back() { return (*this)[size() - 1]; }
 
     void clear()
     {
@@ -128,7 +147,7 @@ private:
     void reallocate_larger()
     {
         if (size() == 0)
-            allocate(8);
+            allocate(1);
         else
             reallocate_larger(size() * 2);
     }

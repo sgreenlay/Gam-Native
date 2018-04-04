@@ -2,27 +2,33 @@
 #include "Imports.h"
 #include "Exports.h"
 
+#include "Util.h"
+
 #include "Parser.h"
 #include "Plant.h"
 
-#if defined(BINARYEN)
 extern "C" int atexit(void (*func)()) { return 0; }
-#else
-#include <random>
 
-extern "C" double random()
+char* strfmt_nz(char* out, int n)
 {
-    static std::default_random_engine gen;
-    static std::uniform_real_distribution<> dist(0, 1);
-    return dist(gen);
+    auto b = (char*)(&n+1)-1;
+    auto e = b - sizeof(n);
+
+    for (auto c = b; c != e; --c)
+    {
+        auto c1 = (unsigned char)(*c) % 16;
+        auto c2 = (unsigned char)(*c) >> 4;
+        *out++ = c2 < 10 ? '0' + c2 : 'a' + c2 - 10;
+        *out++ = c1 < 10 ? '0' + c1 : 'a' + c1 - 10;
+    }
+    return out;
 }
 
-extern "C" void console_log(char* msg)
+char* strfmt_nz(char* out, const char* s)
 {
-    fputs(msg, stdout);
+    while (*s != 0) *out++ = *s++;
+    return out;
 }
-
-#endif
 
 typedef struct {
     int width;
@@ -44,12 +50,14 @@ static plant * p2;
 
 void init(int w, int h)
 {
+    console_log("hello world");
+
     g_window.width = w;
     g_window.height = h;
 
     p = new plant;
     p2 = new plant;
-    *p = plant::make_random(g_window.width / 2, 0);
+    *p = plant::make_random({ (double)g_window.width / 2, (double)g_window.height }, - PI / 2);
 
     g_mouse.x = g_window.width / 2;
     g_mouse.y = g_window.height / 2;
@@ -75,15 +83,17 @@ void mouseMoved(int x, int y, bool pressed)
 
 void render()
 {
+    memscan();
+
     drawRect(0, 0, g_window.width, g_window.height, 255, 255, 255, 1.0f, 0.0f);
 
     if (g_mouse.click)
     {
-        *p = plant::make_random(g_window.width / 2, 0);
+        *p = plant::make_random({ (double)g_window.width / 2, (double)g_window.height }, - PI / 2);
     }
     else
     {
-        p->physics_into(*p2);
+        p->physics_into(*p2, { 0, 0.01 }, g_window.height);
         swap(p, p2);
     }
     g_mouse.click = false;
