@@ -61,6 +61,25 @@ private:
 };
 // </optional>
 
+
+// <span>
+template<class T>
+struct span
+{
+    constexpr span() : m_ptr(nullptr), m_size(0) {}
+    constexpr span(T* p, int s) : m_ptr(p), m_size(s) {}
+
+    constexpr int size() const { return m_size; }
+
+    T* begin() const { return m_ptr; }
+    T* end() const { return m_ptr + m_size; }
+
+private:
+    T * m_ptr;
+    int m_size;
+};
+// </span>
+
 template<class T>
 void swap(T& a, T& b)
 {
@@ -117,7 +136,7 @@ struct vector
     }
 
     template<class...Xs>
-    void resize(int target_size, Xs&...xs)
+    void resize(int target_size, Xs&&...xs)
     {
         if (target_size > size())
         {
@@ -142,6 +161,9 @@ struct vector
         new (m_size) T(forward<Xs>(xs)...);
         ++m_size;
     }
+
+    ::span<T> span() { return ::span<T>{begin(), size()}; }
+    ::span<const T> span() const { return ::span<const T>{begin(), size()}; }
 
 private:
     void reallocate_larger()
@@ -207,21 +229,3 @@ private:
     T * m_size;
     T * m_capacity;
 };
-
-// <span>
-template<class T>
-struct span
-{
-    constexpr span() : m_ptr(nullptr), m_size(0) {}
-    constexpr span(T* p, int s) : m_ptr(p), m_size(s) {}
-
-    constexpr int size() const { return m_size; }
-
-    T* begin() const { return m_ptr; }
-    T* end() const { return m_ptr + m_size; }
-
-private:
-    T * m_ptr;
-    int m_size;
-};
-// </span>

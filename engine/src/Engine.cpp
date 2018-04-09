@@ -27,6 +27,8 @@ static mouse g_mouse;
 static plant * p;
 static plant * p2;
 
+static vector<rule> * g_rules;
+
 void init(int w, int h)
 {
     console_log("hello world");
@@ -36,19 +38,30 @@ void init(int w, int h)
 
     p = new plant;
     p2 = new plant;
-    *p = plant::make_random({ (double)g_window.width / 2, (double)g_window.height }, - PI / 2);
+    *p = plant::make_seed({ (double)g_window.width / 2, (double)g_window.height }, - PI / 2);
+
+    g_rules = new vector<rule>;
 
     g_mouse.x = g_window.width / 2;
     g_mouse.y = g_window.height / 2;
+
+    onInput("0-90%->0;0-50%->0,0;0-100%->0,0,0;");
 }
 
-void onInput(char * c)
+void onInput(const char * c)
 {
-    auto rules = parse(c);
+    console_log("new plant");
 
-    for (auto& rule : rules)
+    *g_rules = parse(c);
+
+    for (auto& rule : *g_rules)
     {
-        console_log(rule.start, " ", rule.probability, " ", rule.end, " ", rule.branch);
+        console_log(
+            rule.start, " ", 
+            rule.probability * 100, "% ", 
+            rule.self, " ", 
+            rule.forward, " ", 
+            rule.branch);
     }
 }
 
@@ -72,12 +85,15 @@ void render()
 
     if (g_mouse.click)
     {
-        *p = plant::make_random({ (double)g_window.width / 2, (double)g_window.height }, - PI / 2);
+        p->grow_into(*p2, g_rules->span());
+        swap(p, p2);
     }
     else
     {
+#ifdef ENABLE_PHYSICS
         p->physics_into(*p2, { 0, 0.01 }, g_window.height);
         swap(p, p2);
+#endif
     }
     g_mouse.click = false;
 

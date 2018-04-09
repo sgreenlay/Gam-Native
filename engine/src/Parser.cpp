@@ -4,8 +4,9 @@ enum token_type
 {
     error,
     number,     // [0-9]
-    transition, // -[0-99]->
+    transition, // -[0-99]%->
     pair,       // [0-9],[0-9]
+    triplet,    // [0-9],[0-9],[0-9]
     split,      // ;
     end
 };
@@ -15,6 +16,7 @@ struct token
     token_type type;
     int n;
     int m;
+    int o;
 };
 
 struct parser
@@ -24,6 +26,12 @@ struct parser
     optional<rule> parse_rule()
     {
         token a = get_next();
+
+        while (a.type == split)
+        {
+            a = get_next();
+        }
+
         if (a.type != number)
         {
             return nullopt;
@@ -43,6 +51,10 @@ struct parser
         else if (b.type == pair)
         {
             return rule{ a.n, p.n / 100.0 , b.n, b.m};
+        }
+        else if (b.type == triplet)
+        {
+            return rule{ a.n, p.n / 100.0 , b.n, b.m, b.o};
         }
 
         return nullopt;
@@ -88,7 +100,20 @@ private:
                     return { error };
                 }
 
-                return { number, n.value(), m.value() };
+                if (*str != ',')
+                {
+                    return { pair, n.value(), m.value() };
+                }
+
+                str++;
+
+                auto o = get_number();
+                if (!o.has_value())
+                {
+                    return { error };
+                }
+
+                return { triplet, n.value(), m.value(), o.value() };
             }
             return { number, n.value() };
         }

@@ -36,6 +36,8 @@ struct branch
     double dr;
 
     int state;
+
+    int parent;
 };
 
 struct constraint
@@ -47,6 +49,7 @@ struct constraint
 
 struct plant
 {
+    static plant make_seed(vec2 start, double direction);
     static plant make_random(vec2 start, double direction);
     static void make_branch(vec2 v, double r, plant& ret, int last);
 
@@ -56,17 +59,5 @@ struct plant
     void physics_into(plant& out, vec2 gravity, double floor) const;
     void grow_into(plant& out, span<rule> rules) const;
 
-    void render()
-    {
-        for (auto& b : branches)
-        {
-            drawRect(
-                (int)b.pos.x,
-                (int)b.pos.y,
-                (int)b.width,
-                (int)b.height,
-                0, 255, 0, 1.0f,
-                b.r);
-        }
-    }
+    void render();
 };

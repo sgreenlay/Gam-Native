@@ -5,7 +5,7 @@
 #include "Util.h"
 
 constexpr int bytes_per_megabyte = 1024000; // 1 MB
-constexpr int max_memory = 0.08 * bytes_per_megabyte; // 2 MB
+constexpr int max_memory = 2 * bytes_per_megabyte;
 
 static char memory[max_memory];
 static int end_of_memory = 0;

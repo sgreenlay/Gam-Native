@@ -9,7 +9,8 @@ struct rule
 {
     int start = -1;
     double probability = 0.0;
-    int end = -1;
+    int self = -1;
+    int forward = -1;
     int branch = -1;
 };
 
