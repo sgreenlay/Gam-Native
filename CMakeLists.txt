@@ -7,6 +7,10 @@ endif()
 
 project(gam CXX)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Binaryen")
+    add_definitions(-DBINARYEN)
+endif()
+
 ## ENGINE
 file(GLOB_RECURSE ENGINE_SOURCES engine/src/*.cpp)
 add_library(engine ${ENGINE_SOURCES})

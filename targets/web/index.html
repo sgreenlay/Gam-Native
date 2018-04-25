@@ -21,11 +21,58 @@
         </style>
         <canvas id="canvas" width="800" height="480"></canvas>
         <script>
+            var exportObject = {
+                internal : {
+                    memory : null,
+                    malloc : null,
+                    free : null
+                },
+                allocateString : (s) => {
+                    if (exportObject.internal.memory == null)
+                    {
+                        return null;
+                    }
+
+                    var size = s.length + 1;
+                    var offset = exportObject.internal.malloc(size);
+
+                    for (var i = 0; i < size - 1; i++)
+                    {
+                        exportObject.internal.memory[offset + i] = s.charCodeAt(i);
+                    }
+                    exportObject.internal.memory[offset + size - 1] = 0;
+
+                    return {
+                        start : offset,
+                        size : size
+                    };
+                },
+                freeString : (str) => {
+                    if (exportObject.internal.memory != null)
+                    {
+                        exportObject.internal.free(str.start);
+                    }
+                },
+                getString : (offset) => {
+                    if (exportObject.internal.memory == null)
+                    {
+                        return "";
+                    }
+
+                    let s = "";
+                    while (exportObject.internal.memory[offset] != 0) {
+                        s += String.fromCharCode(exportObject.internal.memory[offset]);
+                        offset++;
+                    }
+                    return s;
+                }
+            };
+
             var canvas = document.getElementById("canvas");
             var context = canvas.getContext("2d");
 
             var size = { width: canvas.width, height: canvas.height };
-            var mouse = { x : 0, y : 0 };
+            var mouse = { pressed : false, position : { x : 0, y : 0 } };
 
             canvas.width = canvas.width * window.devicePixelRatio;
             canvas.height = canvas.height * window.devicePixelRatio;
@@ -40,12 +87,30 @@
                 return { x : x, y : y };
             };
 
+            canvas.addEventListener('mousedown', (event) => {
+                mouse.pressed = true;
+                mouse.position = getRelativeCoordinates(event);
+            });
+
             canvas.addEventListener('mousemove', (event) => {
-                mouse = getRelativeCoordinates(event);
+                mouse.position = getRelativeCoordinates(event);
+            });
+
+            canvas.addEventListener('mouseup', (event) => {
+                mouse.position = getRelativeCoordinates(event);
+                mouse.pressed = false;
             });
 
             var importObject = {
                 env: {
+                    abort : (offset) => { alert(exportObject.getString(offset)); },
+                    random : () => { return Math.random(); },
+                    sin : (f) => { return Math.sin(f); },
+                    cos : (f) => { return Math.cos(f); },
+                    sqrt : (f) => { return Math.sqrt(f); },
+                    js_console_log : (offset) => {
+                        console.log(exportObject.getString(offset));
+                    },
                     drawRect : (x, y, w, h, r, g, b, a) => {
                         context.fillStyle = 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')';
                         context.fillRect(x, y, w, h);
@@ -54,10 +119,14 @@
             };
 
             WebAssembly.instantiateStreaming(fetch('engine.wasm'), importObject).then(results => {
+                exportObject.internal.memory = new Uint8Array(results.instance.exports.memory.buffer);
+                exportObject.internal.malloc = results.instance.exports.malloc;
+                exportObject.internal.free = results.instance.exports.free;
+
                 results.instance.exports.init(size.width, size.height);
 
                 function renderTick(timestamp) {
-                    results.instance.exports.mouseMoved(mouse.x, mouse.y);
+                    results.instance.exports.mouseMoved(mouse.position.x, mouse.position.y, mouse.pressed);
                     results.instance.exports.render();
                     window.requestAnimationFrame(renderTick);
                 }
