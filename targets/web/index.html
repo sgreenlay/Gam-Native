@@ -108,7 +108,7 @@
                     sin : (f) => { return Math.sin(f); },
                     cos : (f) => { return Math.cos(f); },
                     sqrt : (f) => { return Math.sqrt(f); },
-                    js_console_log : (offset) => {
+                    log : (offset) => {
                         console.log(exportObject.getString(offset));
                     },
                     drawRect : (x, y, w, h, r, g, b, a) => {
@@ -125,9 +125,14 @@
 
                 results.instance.exports.init(size.width, size.height);
 
+                var lastTick = null;
                 function renderTick(timestamp) {
+                    if (!lastTick) lastTick = timestamp;
+                    var deltaInMs = timestamp - lastTick;
+                    lastTick = timestamp;
+
                     results.instance.exports.mouseMoved(mouse.position.x, mouse.position.y, mouse.pressed);
-                    results.instance.exports.render();
+                    results.instance.exports.render(deltaInMs);
                     window.requestAnimationFrame(renderTick);
                 }
                 window.requestAnimationFrame(renderTick);

@@ -34,7 +34,7 @@ void console_log(Xs&&...xs)
 {
     char buf[256];
     strfmt(buf, forward<Xs>(xs)...);
-    ::js_console_log(buf);
+    log(buf);
 }
 
 // <optional>
